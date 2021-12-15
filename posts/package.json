@@ -1,7 +1,6 @@
 {
   "name": "posts",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js"
@@ -14,5 +13,6 @@
     "kafka-node": "^5.0.0",
     "mongoose": "^6.1.2",
     "nodemon": "^2.0.15"
-  }
+  },
+  "description": ""
 }
