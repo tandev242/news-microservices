@@ -11,11 +11,11 @@ const categorySchema = new mongoose.Schema({
         required: true,
         default: ""
     },
-    parent_id: [{
+    parent_id: {
         type: String,
         required: true,
         default: ""
-    }]
+    }
 }, { _id: false })
 
 module.exports = new mongoose.model('Category', categorySchema)

@@ -28,6 +28,12 @@ const consumer = new Consumer(
     option
 );
 
+client.on('ready', () => {
+
+    console.log('POST has connected to kafka')
+
+})
+
 consumer.on("message", async (message) => {
     switch (message.topic) {
         case "category":
