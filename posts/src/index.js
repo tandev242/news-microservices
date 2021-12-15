@@ -17,6 +17,7 @@ mongoose
         console.log("Database connected");
     });
 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.listen(process.env.PORT, () => {
