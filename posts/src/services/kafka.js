@@ -1,9 +1,9 @@
-const express = require("express");
 const kafka = require("kafka-node");
-const fs = require("fs").promises;
 const Consumer = kafka.Consumer;
-const mongoose = require("mongoose");
-const client = new kafka.KafkaClient({ kafkaHost: "127.0.0.1:9092" });
+const client = new kafka.KafkaClient({ kafkaHost: process.env.KAFKA_URL });
+const Post = require("../models/post.model");
+const Category = require("../models/category.model");
+
 const option = {
     groupId: "kafka-node-group", //consumer group id, default `kafka-node-group`
     // Auto commit config
@@ -22,20 +22,13 @@ const option = {
     keyEncoding: "utf8",
 };
 
-const Post = require("./post.model");
-const Category = require("./category.model");
-
 const consumer = new Consumer(
     client,
     [{ topic: "post" }, { topic: "category" }],
     option
 );
-let a = 1;
-consumer.on("message", async (message) => {
-    console.log(a);
-    a++;
-    await fs.writeFile("./test.json", message.value);
 
+consumer.on("message", async (message) => {
     switch (message.topic) {
         case "category":
             const categoryList = JSON.parse(message.value);
@@ -46,9 +39,7 @@ consumer.on("message", async (message) => {
                     console.log(error);
                 }
             }
-
             break;
-
         case "post":
             const postList = JSON.parse(message.value);
             try {
@@ -58,27 +49,8 @@ consumer.on("message", async (message) => {
                     console.log(error);
                 }
             }
-
             break;
-
         default:
             break;
     }
-});
-
-const app = express();
-
-app.use(express.json());
-
-app.listen(process.env.PORT || 3001, () => {
-    try {
-        mongoose.connect("mongodb://localhost:27017/crawl", {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log("Connected to database");
-    } catch (error) {
-        console.log(error);
-    }
-    console.log("Server is starting");
 });
