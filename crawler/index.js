@@ -1,4 +1,3 @@
-const express = require("express");
 require("dotenv").config();
 const Request = require("request");
 const cheerio = require("cheerio");
@@ -8,9 +7,6 @@ const kafka = require("kafka-node");
 const Producer = kafka.Producer;
 const client = new kafka.KafkaClient({ kafkaHost: "127.0.0.1:9092" });
 const producer = new Producer(client);
-const topic = "post";
-
-const app = express();
 
 // Get list post
 async function getListPost(link) {
@@ -195,8 +191,3 @@ const crawl = async (category_id) => {
 //         timezone: "Asia/Ho_Chi_Minh",
 //     }
 // );
-
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//     console.log("Server is listening at " + PORT);
-// });
