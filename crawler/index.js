@@ -82,30 +82,30 @@ let listParentCategory = [
         categoryId: "1001005",
         name: "Thời sự",
     },
-    // {
-    //     categoryId: "1003450",
-    //     name: "Góc nhìn",
-    // },
-    // {
-    //     categoryId: "1001002",
-    //     name: "Thế giới",
-    // },
-    // {
-    //     categoryId: "1001009",
-    //     name: "Khoa học",
-    // },
-    // {
-    //     categoryId: "1001007",
-    //     name: "Pháp luật",
-    // },
-    // {
-    //     categoryId: "1003497",
-    //     name: "Giáo dục",
-    // },
-    // {
-    //     categoryId: "1001012",
-    //     name: "Ý kiến",
-    // },
+    {
+        categoryId: "1003450",
+        name: "Góc nhìn",
+    },
+    {
+        categoryId: "1001002",
+        name: "Thế giới",
+    },
+    {
+        categoryId: "1001009",
+        name: "Khoa học",
+    },
+    {
+        categoryId: "1001007",
+        name: "Pháp luật",
+    },
+    {
+        categoryId: "1003497",
+        name: "Giáo dục",
+    },
+    {
+        categoryId: "1001012",
+        name: "Ý kiến",
+    },
 ];
 
 // Save list parent category
@@ -165,24 +165,24 @@ const crawl = async (category_id) => {
                         }
                     );
 
-                    // await Posts.create(postList);
-                    // const listCate = values.map((e) => {
-                    //     let newCate = {
-                    //         _id: e.original_cate,
-                    //         name: e.article_category.cate_name,
-                    //         parent_id: e.article_category.full_parent,
-                    //     };
-                    //     return newCate;
-                    // });
+                   
+                    const listCate = values.map((e) => {
+                        let newCate = {
+                            _id: e.original_cate,
+                            name: e.article_category.cate_name,
+                            parent_id: e.article_category.full_parent,
+                        };
+                        return newCate;
+                    });
 
-                    // producer.send(
-                    //     [{ topic: "category", messages: JSON.stringify(listCate) }],
-                    //     function (err, data) {
-                    //         console.log(data);
-                    //     }
-                    // );
+                    producer.send(
+                        [{ topic: "category", messages: JSON.stringify(listCate) }],
+                        function (err, data) {
+                            console.log(data);
+                        }
+                    );
 
-                    // await Categories.create(listCate);
+                    
                 } catch (error) {
                     if (error.code !== 11000) {
                         console.log(error);
