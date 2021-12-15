@@ -1,14 +1,8 @@
 const express = require("express");
 require("dotenv").config();
 const Request = require("request");
-const mongoose = require("mongoose");
 const cheerio = require("cheerio");
-const fs = require("fs").promises;
 var cron = require("node-cron");
-const Posts = require("./post.model");
-const Categories = require("./category.model");
-const axios = require("axios");
-// const fetch = require('node-fetch');
 
 const kafka = require("kafka-node");
 const Producer = kafka.Producer;
@@ -16,21 +10,7 @@ const client = new kafka.KafkaClient({ kafkaHost: "127.0.0.1:9092" });
 const producer = new Producer(client);
 const topic = "post";
 
-// producer.on('ready', () => {
-//   console.log('connected')
-// })
-
 const app = express();
-
-try {
-    mongoose.connect("mongodb://localhost:27017/crawl", {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-    console.log("Connected to database");
-} catch (error) {
-    console.log(error);
-}
 
 // Get list post
 async function getListPost(link) {
@@ -108,21 +88,11 @@ let listParentCategory = [
     },
 ];
 
-// Save list parent category
-// (async () => {
-//     try {
-//         await Categories.create(listParentCategory);
-//     } catch (error) {
-//         if (error.code !== 11000) {
-//             console.log(error);
-//         }
-//     }
-// })();
 
 // crawl function
 const crawl = async (category_id) => {
     // let category_id = "1001002";
-    let limit = "50";
+    let limit = "5";
     let link = `https://gw.vnexpress.net/mv?site_id=1000000&category_id=${category_id}&type=1&limit=${limit}&data_select=article_id,article_type,title,share_url,thumbnail_url,publish_time,lead,privacy,original_cate,article_category`;
     try {
         const listPost = await getListPost(link);
@@ -226,7 +196,7 @@ const crawl = async (category_id) => {
 //     }
 // );
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("Server is listening at " + PORT);
-});
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//     console.log("Server is listening at " + PORT);
+// });
