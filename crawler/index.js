@@ -1,4 +1,3 @@
-require("dotenv").config();
 const Request = require("request");
 const cheerio = require("cheerio");
 var cron = require("node-cron");
@@ -88,74 +87,134 @@ let listParentCategory = [
 // crawl function
 const crawl = async (category_id) => {
     // let category_id = "1001002";
-    let limit = "5";
+    let limit = "50";
     let link = `https://gw.vnexpress.net/mv?site_id=1000000&category_id=${category_id}&type=1&limit=${limit}&data_select=article_id,article_type,title,share_url,thumbnail_url,publish_time,lead,privacy,original_cate,article_category`;
     try {
         const listPost = await getListPost(link);
         if (listPost.data[category_id].data) {
-            Promise.all(
-                listPost.data[category_id].data.map((e) => {
-                    if (e.share_url) {
-                        return new Promise(async (resolve, reject) => {
-                            try {
-                                var content = await getContent(e.share_url);
-                            } catch (error) {
-                                console.log(error);
-                            }
-
-                            e.content = content;
-
-                            resolve(e);
-                        });
-                    }
-                })
-            ).then(async (values) => {
-                try {
-                    const postList = values.map((e) => {
-                        let newPost = {
-                            publish_time: e.publish_time,
-                            title: e.title,
-                            _id: e.article_id,
-                            categoryId: e.original_cate,
-                            lead: e.lead,
-                            thumbnail_url: e.thumbnail_url,
-                            content: e.content,
-                        };
-                        return newPost;
-                    });
-                    // console.log(postList);
-                    producer.send(
-                        [{ topic: "post", messages: JSON.stringify(postList) }],
-                        function (err, data) {
-                            console.log(data);
-                        }
-                    );
-
-                   
-                    const listCate = values.map((e) => {
-                        let newCate = {
-                            _id: e.original_cate,
-                            name: e.article_category.cate_name,
-                            parent_id: e.article_category.full_parent,
-                            slug: e.article_category.cate_url
-                        };
-                        return newCate;
-                    });
-
-                    producer.send(
-                        [{ topic: "category", messages: JSON.stringify(listCate) }],
-                        function (err, data) {
-                            console.log(data);
-                        }
-                    );
-
-                    
-                } catch (error) {
-                    if (error.code !== 11000) {
+            for (let el of listPost.data[category_id].data) {
+                if (el.share_url) { 
+                    try {
+                        var content = await getContent(el.share_url);
+                        // console.log(el);
+                        el.content = content;
+                    } catch (error) {
                         console.log(error);
                     }
                 }
-            });
+
+            }
+            try {
+                const postList = listPost.data[category_id].data.map((e) => {
+                    let newPost = {
+                        publish_time: e.publish_time,
+                        title: e.title,
+                        _id: e.article_id,
+                        categoryId: e.original_cate,
+                        lead: e.lead,
+                        thumbnail_url: e.thumbnail_url,
+                        content: e.content,
+                    };
+                    return newPost;
+                });
+                // console.log(postList);
+                producer.send(
+                    [{ topic: "post", messages: JSON.stringify(postList) }],
+                    function (err, data) {
+                        // console.log(data);
+                    }
+                );
+
+               
+                const listCate = listPost.data[category_id].data.map((e) => {
+                    let newCate = {
+                        _id: e.original_cate,
+                        name: e.article_category.cate_name,
+                        parent_id: e.article_category.full_parent,
+                        slug: e.article_category.cate_url
+                    };
+                    return newCate;
+                });
+
+                producer.send(
+                    [{ topic: "category", messages: JSON.stringify(listCate) }],
+                    function (err, data) {
+                        // console.log(data);
+                    }
+                );
+
+                
+            } catch (error) {
+                if (error.code !== 11000) {
+                    console.log(error);
+                }
+            }
+
+
+
+            // Promise.all(
+            //     listPost.data[category_id].data.map((e) => {
+            //         if (e.share_url) {
+            //             return new Promise(async (resolve, reject) => {
+            //                 try {
+            //                     var content = await getContent(e.share_url);
+            //                 } catch (error) {
+            //                     console.log(error);
+            //                 }
+
+            //                 e.content = content;
+
+            //                 resolve(e);
+            //             });
+            //         }
+            //     })
+            // ).then(async (values) => {
+            //     try {
+            //         const postList = values.map((e) => {
+            //             let newPost = {
+            //                 publish_time: e.publish_time,
+            //                 title: e.title,
+            //                 _id: e.article_id,
+            //                 categoryId: e.original_cate,
+            //                 lead: e.lead,
+            //                 thumbnail_url: e.thumbnail_url,
+            //                 content: e.content,
+            //             };
+            //             return newPost;
+            //         });
+            //         // console.log(postList);
+            //         producer.send(
+            //             [{ topic: "post", messages: JSON.stringify(postList) }],
+            //             function (err, data) {
+            //                 console.log(data);
+            //             }
+            //         );
+
+                   
+            //         const listCate = values.map((e) => {
+            //             let newCate = {
+            //                 _id: e.original_cate,
+            //                 name: e.article_category.cate_name,
+            //                 parent_id: e.article_category.full_parent,
+            //                 slug: e.article_category.cate_url
+            //             };
+            //             return newCate;
+            //         });
+
+            //         producer.send(
+            //             [{ topic: "category", messages: JSON.stringify(listCate) }],
+            //             function (err, data) {
+            //                 console.log(data);
+            //             }
+            //         );
+
+                    
+            //     } catch (error) {
+            //         if (error.code !== 11000) {
+            //             console.log(error);
+            //         }
+            //     }
+            // });
         }
     } catch (error) {
         console.log(error);

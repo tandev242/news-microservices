@@ -4,6 +4,22 @@ const client = new kafka.KafkaClient({ kafkaHost: process.env.KAFKA_URL });
 const Post = require("../models/post.model");
 const Category = require("../models/category.model");
 
+// Create topic
+var topicsToCreate = [
+    {
+        topic: "post",
+        partitions: 1,
+        replicationFactor: 1,
+    },
+    {
+        topic: "category",
+        partitions: 1,
+        replicationFactor: 1,
+    },
+];
+
+
+
 const option = {
     groupId: "kafka-node-group", //consumer group id, default `kafka-node-group`
     // Auto commit config
@@ -22,19 +38,22 @@ const option = {
     keyEncoding: "utf8",
 };
 
+
+client.on("ready", () => {
+    client.createTopics(topicsToCreate, (error, result) => {
+        console.log(error);
+    });
+    console.log("POST has connected to kafka");
+});
+
 const consumer = new Consumer(
     client,
     [{ topic: "post" }, { topic: "category" }],
     option
 );
 
-client.on('ready', () => {
-
-    console.log('POST has connected to kafka')
-
-})
-
 consumer.on("message", async (message) => {
+    // console.log(Object.keys(message.value))
     switch (message.topic) {
         case "category":
             const categoryList = JSON.parse(message.value);
@@ -60,3 +79,5 @@ consumer.on("message", async (message) => {
             break;
     }
 });
+
+
