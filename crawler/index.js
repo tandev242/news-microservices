@@ -43,13 +43,11 @@ async function getContent(link) {
                     console.log("Can't load url");
                     // reject(new Error("Can' load url"));
                 } else {
-                    // setTimeout(() => {
-                        const $ = cheerio.load(body);
-                        var content = $(
-                            "body > section.section.page-detail.top-detail > div > div.sidebar-1 > article"
-                        ).html();
-                        resolve(content);
-                    // }, 300);
+                    const $ = cheerio.load(body);
+                    var content = $(
+                        "body > section.section.page-detail.top-detail > div > div.sidebar-1 > article"
+                    ).html();
+                    resolve(content);
                 }
             }
         );
@@ -106,13 +104,13 @@ const crawl = async (category_id) => {
                 let newPost = {
                     title: e.title,
                     _id: e.article_id,
-                    slug: slugify(e.title , {
+                    slug: slugify(e.title, {
                         remove: undefined, // remove characters that match regex, defaults to `undefined`
                         lower: true,      // convert to lower case, defaults to `false`
                         strict: true,     // strip special characters except replacement, defaults to `false`
                         locale: 'vi',       // language code of the locale to use
                         trim: true         // trim leading and trailing replacement chars, defaults to `true`
-                      }),
+                    }),
                     categoryId: e.original_cate,
                     lead: e.lead,
                     thumbnailUrl: e.thumbnail_url,
