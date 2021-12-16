@@ -41,7 +41,12 @@ const option = {
 
 client.on("ready", () => {
     client.createTopics(topicsToCreate, (error, result) => {
-        console.log(error);
+        if(error){
+            console.log(error);
+        }
+        if(result){
+            console.log("Topic started successfully")
+        }
     });
     console.log("POST has connected to kafka");
 });
