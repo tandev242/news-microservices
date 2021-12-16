@@ -137,6 +137,7 @@ const crawl = async (category_id) => {
                             _id: e.original_cate,
                             name: e.article_category.cate_name,
                             parent_id: e.article_category.full_parent,
+                            slug: e.article_category.cate_url
                         };
                         return newCate;
                     });
