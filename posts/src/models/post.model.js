@@ -5,6 +5,11 @@ const postSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
+    slug: {
+        type: String,
+        required: true,
+        unique: true
+    },
     categoryId: {
         type: String,
         required: true,
@@ -25,7 +30,7 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: ''
     },
-    thumbnail_url: {
+    thumbnailUrl: {
         type: String,
         required: true,
         default: ''
