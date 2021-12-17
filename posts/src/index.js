@@ -4,6 +4,8 @@ const app = express();
 const mongoose = require('mongoose');
 env.config();
 
+const postRouter = require('./routes/post.route')
+
 mongoose
     .connect(
         process.env.CONNECTION_STRING,
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 require("./services/kafka");
+
+app.use(postRouter)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
