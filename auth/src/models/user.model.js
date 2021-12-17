@@ -3,10 +3,10 @@ const bcrypt = require('bcrypt')
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    _id: {
       type: String,
       required: true,
-      default: '',
+      unique: true,
     },
     email: {
       type: String,
@@ -19,10 +19,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
-    avatar: {
-      type: String,
-      default: process.env.DEFAULT_IMAGE,
-    },
     role: {
       type: String,
       required: true,
@@ -30,21 +26,9 @@ const userSchema = new mongoose.Schema(
       default: 'user',
     },
   },
-  { timestamps: true }
+  { _id: false, timestamps: true }
 )
 
-userSchema.pre('save', async function (next) {
-  const user = this
-  //ignore user created with no changed password
-  if (!user.isModified('password')) return next()
-  try {
-    const hashedPassword = await bcrypt.hash(user.password, 8)
-    user.password = hashedPassword
-    next()
-  } catch (error) {
-    next(error)
-  }
-})
 userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
     const isMatch = await bcrypt.compare(candidatePassword, this.password)

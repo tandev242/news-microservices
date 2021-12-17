@@ -16,6 +16,14 @@ const validateRequestSchema = (req, res, next) => {
 
 const registerSchema = [
   body('name').isString().withMessage('your name is invalid'),
+  body('role')
+    .custom((value) => {
+      if (!['user', 'admin'].includes(value)) {
+        throw new Error('Password confirmation does not match password')
+      }
+      return true
+    })
+    .withMessage('your role invalid'),
   body('email')
     .isEmail()
     .withMessage('email must contain a valid email address'),

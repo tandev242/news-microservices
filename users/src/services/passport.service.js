@@ -1,4 +1,3 @@
-const fs = require('fs')
 const User = require('../models/user.model')
 const { Strategy: JWTStrategy, ExtractJwt } = require('passport-jwt')
 
@@ -21,7 +20,6 @@ const strategy = new JWTStrategy(opts, async (payload, done) => {
   }
 })
 
-// TODO
 module.exports = (passport) => {
   passport.use(strategy)
 }

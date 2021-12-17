@@ -2,19 +2,20 @@ const Token = require('../models/token.model.js')
 const { randomBytes } = require('crypto')
 const User = require('../models/user.model')
 const { sendMail, createOutput } = require('../services/mail.service')
-const cloudinary = require('../utils/cloudinary')
+const { cloudinary, getPublicId } = require('../utils/cloudinary')
 
 const signUp = async (req, res) => {
-  const { email, password, name } = req.body
+  const { email, password, name, role } = req.body
   try {
     const existUser = await User.findOne({ email })
     if (existUser) {
       return res.status(400).json({ success: false, msg: 'email exist' })
     }
-    await User.create({ email, password, name })
+    const newUser = await User.create({ email, password, name, role })
+
     res
       .status(201)
-      .json({ success: true, message: 'create new account successfully' })
+      .json({ success: true, msg: 'create new account successfully' })
   } catch (error) {
     res.status(400).json({ success: false, msg: error.message })
   }
@@ -67,8 +68,7 @@ const resetPassword = async (req, res) => {
     user.password = newPassword
     await user.save()
     await tokenRecord.remove()
-
-    res.status(200).json({ success: true, message: 'update user successfully' })
+    res.status(200).json({ success: true, msg: 'update user successfully' })
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message })
   }
@@ -76,14 +76,38 @@ const resetPassword = async (req, res) => {
 
 const uploadAvatar = async (req, res) => {
   try {
-    const result = await cloudinary.uploader.upload(req.file.path)
     const user = req.user
+    const result = await cloudinary.uploader.upload(req.file.path)
+    if (user.avatar !== process.env.DEFAULT_IMAGE && user.avatar) {
+      await cloudinary.uploader.destroy(getPublicId(user.avatar))
+    }
     user.avatar = result.url
     await user.save()
     res.status(200).json({ success: true, msg: 'update avatar successfully' })
   } catch (error) {
+    console.log(error)
     res.status(200).json({ success: false, msg: error.message })
   }
 }
 
-module.exports = { signUp, forgotPassword, resetPassword, uploadAvatar }
+const getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await User.find()
+    res.status(200).json({ success: true, data: allUsers })
+  } catch (error) {
+    res.status(400).json({ success: false, msg: error.message })
+  }
+}
+
+const getCurrentUser = (req, res) => {
+  return req.user
+}
+
+module.exports = {
+  signUp,
+  forgotPassword,
+  resetPassword,
+  uploadAvatar,
+  getCurrentUser,
+  getAllUsers,
+}

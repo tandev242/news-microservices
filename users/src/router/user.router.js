@@ -9,34 +9,39 @@ const {
   forgotPasswordSchema,
 } = require('../validator/validateRequestSchema')
 
+const { isAdmin } = require('../middleware/authorization')
+
 const userController = require('../controller/user.controller.js')
 
 router.post(
-  '/sign-up',
+  '/signUp',
   registerSchema,
   validateRequestSchema,
   userController.signUp
 )
 
 router.post(
-  '/forgot-password',
+  '/forgotPassword',
   forgotPasswordSchema,
   validateRequestSchema,
   userController.forgotPassword
 )
 
-router.patch(
-  '/reset-password/:token',
+router.post(
+  '/resetPassword/:token',
   resetPasswordSchema,
   validateRequestSchema,
   userController.resetPassword
 )
 
-router.patch(
-  '/upload-avatar',
+router.post(
+  '/uploadAvatar',
   passport.authenticate('jwt', { session: false }),
   uploadAvatar,
   userController.uploadAvatar
 )
+
+router.get('/getAllUsers', passport.authenticate('jwt', { session: false }),isAdmin,userController.getAllUsers)
+router.get('/',passport.authenticate('jwt', { session: false }),userController.getCurrentUser)
 
 module.exports = router
