@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { autoIncrement } =  require('mongoose-plugin-autoinc');
 
 const postSchema = new mongoose.Schema({
     _id: {
@@ -37,12 +36,5 @@ const postSchema = new mongoose.Schema({
         default: ''
     },
 }, { _id: false, timestamps: true });
-
-postSchema.plugin(autoIncrement, {
-    model: "Post",
-    field: "_id",
-    startAt: 4600000,
-    incrementBy: 1
-})
 
 module.exports = new mongoose.model("Post", postSchema);
