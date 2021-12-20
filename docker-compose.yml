@@ -23,7 +23,7 @@ services:
     image: crawlerservice
     build:
       context: crawler
-      dockerfile: ./crawler/Dockerfile
+      dockerfile: ./Dockerfile
     environment:
       NODE_ENV: production
     ports:

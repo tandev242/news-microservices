@@ -16,6 +16,7 @@
     "kafka-node": "^5.0.0",
     "mongoose": "^6.1.2",
     "mongoose-increment": "^2.0.0",
+    "nodemon": "^2.0.15",
     "slugify": "^1.6.4"
   }
 }
