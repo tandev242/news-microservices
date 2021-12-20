@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
 const postCommentSchema = new mongoose.Schema({
+    postId: {
+        type: String,
+        required: true,
+    },
     userId: {
         type: String,
         required: true
@@ -18,7 +22,10 @@ const postCommentSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        timestamps: true
+        createdAt: {
+            type: Date,
+            default: new Date()
+        }
     }]
 }, { timestamps: true });
 
