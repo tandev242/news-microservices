@@ -1,4 +1,3 @@
-const Users = require("../models/User.model")
 const jwt = require('jsonwebtoken')
 
 const auth = async (req, res, next) => {
@@ -11,10 +10,7 @@ const auth = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         if (!decoded) return res.status(401).json({ msg: "Invalid Authentication.." })
 
-        // Find user
-        const user = await Users.findOne({ _id: decoded.id }, '_id')
-
-        req.user = user
+        req.user.userId = decoded._id
         next()
     } catch (err) {
         return res.status(401).json({ msg: err.message })

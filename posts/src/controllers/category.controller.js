@@ -5,7 +5,6 @@ const slugify = require("slugify");
 const {sendProducer} = require('../services/kafkaProducer')
 
 class postController {
-    // parentId tạo như thế nào?
     async addCategory(req, res, next) {
         try {
             const {slug, name, parentId} = req.body

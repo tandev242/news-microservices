@@ -110,7 +110,7 @@ consumer.on("message", async (message) => {
         case "post":
             const postList = JSON.parse(message.value);
             try {
-                await Post.create(postList);
+                await Posts.create(postList);
             } catch (error) {
                 if (error.code !== 11000) {
                     console.log(error);

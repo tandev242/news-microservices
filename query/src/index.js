@@ -18,6 +18,8 @@ app.get('/api/query/post', async (req, res, next) => {
     }
 })
 
+
+
 require('./services/kafkaConsumer')
 
 // Error 404 - Not found

@@ -5,7 +5,6 @@ const slugify = require("slugify");
 const {sendProducer} = require('../services/kafkaProducer')
 
 class postController {
-    // có nên cho user tạo post hay không? nếu không thì phải phân quyền cho 
     async addPost(req, res, next) {
         try {
             const {title, categoryId, lead, content, thumbnailUrl} = req.body
