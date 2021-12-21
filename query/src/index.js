@@ -4,21 +4,12 @@ const createError = require('http-errors')
 const mongoose = require('mongoose')
 require("dotenv").config()
 
-const Posts = require('./models/post.model')
+const postRouter = require('./routes/post.route')
 const PORT = process.env.PORT || 7000
 
 app.use(express.json())
 
-app.get('/api/query/post', async (req, res, next) => {
-    try {
-        const foundPost = await Posts.find().populate('categoryId')
-        return res.status(200).json({success: true, data: foundPost})
-    } catch (error) {
-        return next(createError(400, {success: false, message: error.message}))
-    }
-})
-
-
+app.use('/api/post', postRouter)
 
 require('./services/kafkaConsumer')
 

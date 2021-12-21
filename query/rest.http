@@ -1,1 +1,19 @@
 GET http://localhost:7000/api/query/post
+
+###
+GET http://localhost:7000/api/post/getPostBySlug/tau-cat-linh-ha-dong-khong-the-lay-hanh-khach-ra-dien-tap
+
+###
+GET http://localhost:7000/api/post/lastPost
+
+###
+GET http://localhost:7000/api/post
+
+###
+GET http://localhost:7000/api/post/getPostByCategory/the-gioi
+
+###
+GET http://localhost:7000/api/post/getListCategory
+
+###
+GET http://localhost:7000/api/post/getAllPostByCategory/thoi-su/chinh-tri
