@@ -8,7 +8,7 @@ router.get('/getPostBySlug/:slug', postController.getPostBySlug)
 router.get('/lastPost', postController.getLastPost)
 
 // Lấy tất cả post
-router.get('/', postController.getAllPost)
+router.get('/getAllPost', postController.getAllPost)
 
 // Lấy 4 post dựa theo slug của category. Hiển thị ở trang chủ
 router.get('/getPostByCategory/:slug', postController.getPostByCategory)
