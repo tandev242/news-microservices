@@ -3,7 +3,6 @@ const cheerio = require("cheerio");
 var cron = require("node-cron");
 const slugify = require("slugify");
 
-
 const kafka = require("kafka-node");
 const Producer = kafka.Producer;
 const client = new kafka.KafkaClient({ kafkaHost: "127.0.0.1:9092" });
@@ -14,14 +13,14 @@ async function getListPost(link) {
     return new Promise((resolve, reject) => {
         Request(
             {
-                method: 'GET',
+                method: "GET",
                 url: link,
             },
             function (err, response, body) {
-                if (err) reject(err)
-                resolve(JSON.parse(body))
+                if (err) reject(err);
+                resolve(JSON.parse(body));
             }
-        )
+        );
     });
 }
 
@@ -44,9 +43,12 @@ async function getContent(link) {
                     // reject(new Error("Can' load url"));
                 } else {
                     const $ = cheerio.load(body);
-                    var content = $(
-                        "body > section.section.page-detail.top-detail > div > div.sidebar-1 > article"
-                    ).html();
+                    var content = String(
+                        $(
+                            "body > section.section.page-detail.top-detail > div > div.sidebar-1 > article"
+                        ).html()
+                    );
+
                     resolve(content);
                 }
             }
@@ -85,7 +87,6 @@ let listParentCategory = [
     },
 ];
 
-
 // crawl function
 const crawl = async (category_id) => {
     let limit = "50";
@@ -97,6 +98,11 @@ const crawl = async (category_id) => {
                 if (el.share_url) {
                     var content = await getContent(el.share_url);
                     // console.log(el);
+                    content = content.replaceAll('"', "'");
+                    content = content.replaceAll("amp;", "");
+                    content = content.replaceAll("src", "src1");
+                    content = content.replaceAll("data-src1", "src");
+
                     el.content = content;
                 }
             }
@@ -106,10 +112,10 @@ const crawl = async (category_id) => {
                     _id: e.article_id,
                     slug: slugify(e.title, {
                         remove: undefined, // remove characters that match regex, defaults to `undefined`
-                        lower: true,      // convert to lower case, defaults to `false`
-                        strict: true,     // strip special characters except replacement, defaults to `false`
-                        locale: 'vi',       // language code of the locale to use
-                        trim: true         // trim leading and trailing replacement chars, defaults to `true`
+                        lower: true, // convert to lower case, defaults to `false`
+                        strict: true, // strip special characters except replacement, defaults to `false`
+                        locale: "vi", // language code of the locale to use
+                        trim: true, // trim leading and trailing replacement chars, defaults to `true`
                     }),
                     categoryId: e.original_cate,
                     lead: e.lead,
@@ -131,7 +137,7 @@ const crawl = async (category_id) => {
                     _id: e.original_cate,
                     name: e.article_category.cate_name,
                     parentId: e.article_category.full_parent,
-                    slug: e.article_category.cate_url
+                    slug: e.article_category.cate_url,
                 };
                 return newCate;
             });
@@ -181,7 +187,6 @@ const crawl = async (category_id) => {
         //             }
         //         );
 
-
         //         const listCate = values.map((e) => {
         //             let newCate = {
         //                 _id: e.original_cate,
@@ -198,7 +203,6 @@ const crawl = async (category_id) => {
         //                 console.log(data);
         //             }
         //         );
-
 
         //     } catch (error) {
         //         if (error.code !== 11000) {
@@ -218,7 +222,7 @@ const crawl = async (category_id) => {
         // Promise.all(
         listParentCategory.map(async (e) => {
             await crawl(String(e.categoryId));
-        })
+        });
         // );
     } catch (error) {
         console.log(error);
