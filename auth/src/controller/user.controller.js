@@ -16,7 +16,10 @@ const login = async (req, res) => {
         .status(400)
         .json({ success: false, errors: 'email or password incorrect' })
     }
-    const token = jwt.sign({ data: user._id }, process.env.JWT_SECRET)
+    const token = jwt.sign(
+      { _id: user._id, role: user.role },
+      process.env.JWT_SECRET
+    )
     return res
       .status(200)
       .json({ success: true, message: `login successfully`, data: { token } })

@@ -9,8 +9,6 @@ const {
   forgotPasswordSchema,
 } = require('../validator/validateRequestSchema')
 
-const { isAdmin } = require('../middleware/authorization')
-
 const userController = require('../controller/user.controller.js')
 
 router.post(
@@ -40,8 +38,9 @@ router.post(
   uploadAvatar,
   userController.uploadAvatar
 )
-
-router.get('/getAllUsers', passport.authenticate('jwt', { session: false }),isAdmin,userController.getAllUsers)
-router.get('/',passport.authenticate('jwt', { session: false }),userController.getCurrentUser)
-
+router.post(
+  '/signUpForAdmin',
+  passport.authenticate('jwt', { session: false }),
+  userController.signUpForAdmin
+)
 module.exports = router

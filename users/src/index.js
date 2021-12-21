@@ -6,6 +6,7 @@ const userRouter = require('./router/user.router')
 const morgan = require('morgan')
 const passport = require('passport')
 require('./services/passport.service')(passport)
+require('./services/kafkaProducer')
 
 const port = process.env.PORT || 5000
 mongoose
