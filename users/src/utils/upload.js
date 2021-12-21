@@ -11,7 +11,7 @@ const upload = multer({
     if (!file) {
       return cb(null, false)
     }
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/i)) {
       return cb(null, false)
     }
     cb(undefined, true)

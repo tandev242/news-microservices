@@ -64,7 +64,6 @@ class postController {
             if (updatePost.matchedCount === 0) {
                 return next(createError(400, {success: false, message: "Can't find postId"}))
             }
-
             
             // Kafka 
             await sendProducer('updatePost', {postId, update})

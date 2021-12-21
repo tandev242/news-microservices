@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   zookeeper:
     image: 'bitnami/zookeeper:latest'
@@ -8,7 +8,6 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
   kafka:
     image: 'bitnami/kafka:latest'
-    container_name: 'kafka'
     ports:
       - '9092:9092'
     environment:
@@ -26,5 +25,5 @@ services:
       dockerfile: ./Dockerfile
     environment:
       NODE_ENV: production
-    ports:
-      - 3000:3000
+    depends_on:
+      - kafka

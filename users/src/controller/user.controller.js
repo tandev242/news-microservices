@@ -3,16 +3,39 @@ const { randomBytes } = require('crypto')
 const User = require('../models/user.model')
 const { sendMail, createOutput } = require('../services/mail.service')
 const { cloudinary, getPublicId } = require('../utils/cloudinary')
+const { sendProducer } = require('../services/kafkaProducer')
 
 const signUp = async (req, res) => {
-  const { email, password, name, role } = req.body
+  const { email, password, name } = req.body
   try {
     const existUser = await User.findOne({ email })
     if (existUser) {
       return res.status(400).json({ success: false, msg: 'email exist' })
     }
-    const newUser = await User.create({ email, password, name, role })
+    const newUser = await User.create({ email, password, name })
+    sendProducer('createUser', { newUser })
+    res
+      .status(201)
+      .json({ success: true, msg: 'create new account successfully' })
+  } catch (error) {
+    res.status(400).json({ success: false, msg: error.message })
+  }
+}
 
+const signUpForAdmin = async (req, res) => {
+  const { email, password, name } = req.body
+  if (!(req.user.role === 'admin')) {
+    return res
+      .status(403)
+      .json({ success: false, msg: 'Authorization failure' })
+  }
+  try {
+    const existUser = await User.findOne({ email })
+    if (existUser) {
+      return res.status(400).json({ success: false, msg: 'email exist' })
+    }
+    const newUser = await User.create({ email, password, name, role: 'admin' })
+    sendProducer('createUser', { newUser })
     res
       .status(201)
       .json({ success: true, msg: 'create new account successfully' })
@@ -38,7 +61,6 @@ const forgotPassword = async (req, res) => {
     })
     const output = createOutput(`http://localhost:3000/reset-password/${token}`)
     sendMail(email, output)
-
     res.status(200).json({
       success: true,
       message:
@@ -66,8 +88,9 @@ const resetPassword = async (req, res) => {
       return res.status(404).json({ success: false, msg: 'user is not found' })
     }
     user.password = newPassword
-    await user.save()
+    const newUser = await user.save()
     await tokenRecord.remove()
+    sendProducer('updateUser', { newUser })
     res.status(200).json({ success: true, msg: 'update user successfully' })
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message })
@@ -82,25 +105,13 @@ const uploadAvatar = async (req, res) => {
       await cloudinary.uploader.destroy(getPublicId(user.avatar))
     }
     user.avatar = result.url
-    await user.save()
+    const newUser = await user.save()
+    sendProducer('updateUser', { newUser })
     res.status(200).json({ success: true, msg: 'update avatar successfully' })
   } catch (error) {
     console.log(error)
-    res.status(200).json({ success: false, msg: error.message })
+    res.status(500).json({ success: false, msg: error.message })
   }
-}
-
-const getAllUsers = async (req, res) => {
-  try {
-    const allUsers = await User.find()
-    res.status(200).json({ success: true, data: allUsers })
-  } catch (error) {
-    res.status(400).json({ success: false, msg: error.message })
-  }
-}
-
-const getCurrentUser = (req, res) => {
-  return req.user
 }
 
 module.exports = {
@@ -108,6 +119,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   uploadAvatar,
-  getCurrentUser,
-  getAllUsers,
+  signUpForAdmin,
 }
