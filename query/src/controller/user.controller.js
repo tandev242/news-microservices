@@ -1,5 +1,9 @@
+const User = require('../models/user.model')
 const getCurrentUser = (req, res) => {
-  console.log(req.user)
   return res.status(200).json({ success: true, user: req.user })
 }
-module.exports = { getCurrentUser }
+const getAllUser = async (req, res) => {
+  const users = await User.find()
+  res.status(200).json({ success: true, users })
+}
+module.exports = { getCurrentUser, getAllUser }
