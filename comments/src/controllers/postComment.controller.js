@@ -1,4 +1,5 @@
 const PostComment = require('../models/postComment.model')
+const { sendToConsumer } = require('../services/kafka')
 
 const addPostComment = async (req, res) => {
     const { postId, content } = req.body;
@@ -6,6 +7,9 @@ const addPostComment = async (req, res) => {
     try {
         const postComment = new PostComment({ postId, userId, content });
         await postComment.save();
+
+        await sendToConsumer('addPostComment', { _id: postComment._id, postId, userId, content });
+
         res.status(201).json({
             success: true,
             message:
@@ -20,9 +24,12 @@ const addSubPostComment = async (req, res) => {
     const { _id, content } = req.body;
     const userId = req.user._id;
     try {
-        await PostComment.updateOne({ _id },
+        await PostComment.findOneAndUpdate({ _id },
             { $push: { subComments: { userId, content } } },
             { new: true, upsert: true });
+
+        await sendToConsumer('addSubPostComment', { _id, content, userId });
+
         res.status(201).json({
             success: true,
             message:

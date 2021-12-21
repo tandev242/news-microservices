@@ -4,6 +4,8 @@ const client = new kafka.KafkaClient({ kafkaHost: process.env.KAFKA_URL })
 const Posts = require('../models/post.model')
 const Category = require('../models/category.model')
 const User = require('../models/user.model')
+const PostComment = require("../models/postComment.model");
+const TopicComment = require("../models/topicComment.model");
 const slugify = require('slugify')
 
 // Create topic
@@ -48,7 +50,38 @@ var topicsToCreate = [
     partitions: 1,
     replicationFactor: 1,
   },
+  {
+    topic: 'createUser',
+    partitions: 1,
+    replicationFactor: 1,
+  },
+  {
+    topic: 'updateUser',
+    partitions: 1,
+    replicationFactor: 1,
+  },
+  {
+    topic: "addPostComment",
+    partitions: 1,
+    replicationFactor: 1,
+  },
+  {
+    topic: "addSubPostComment",
+    partitions: 1,
+    replicationFactor: 1,
+  },
+  {
+    topic: "addTopicComment",
+    partitions: 1,
+    replicationFactor: 1,
+  },
+  {
+    topic: "addSubTopicComment",
+    partitions: 1,
+    replicationFactor: 1,
+  },
 ]
+
 
 const option = {
   groupId: 'kafka-node-group', //consumer group id, default `kafka-node-group`
@@ -93,10 +126,13 @@ const consumer = new Consumer(
     { topic: 'deleteCategory' },
     { topic: 'createUser' },
     { topic: 'updateUser' },
+    { topic: "addPostComment" },
+    { topic: "addSubPostComment" },
+    { topic: "addTopicComment" },
+    { topic: "addSubTopicComment" },
   ],
   option
 )
-
 consumer.on('message', async (message) => {
   // console.log(Object.keys(message.value))
   switch (message.topic) {
@@ -212,8 +248,54 @@ consumer.on('message', async (message) => {
       } catch (error) {
         console.log(error)
       }
-      break
+      break;
+    case "addPostComment":
+      console.log("Add postComment");
+      try {
+        let { _id, postId, userId, content } = JSON.parse(message.value);
+        // receive new postComment and save to db
+        const newPostComment = new PostComment({ _id, postId, userId, content });
+        await newPostComment.save();
+      } catch (error) {
+        console.log(error);
+      }
+      break;
+    case "addSubPostComment":
+      console.log("Add subPostComment");
+      try {
+        const { _id, content, userId } = JSON.parse(message.value);
+        await PostComment.updateOne({ _id },
+          { $push: { subComments: { userId, content } } },
+          { new: true, upsert: true });
+      } catch (error) {
+        console.log(error);
+      }
+      break;
+
+    case "addTopicComment":
+      console.log("Add TopicComment");
+      try {
+        let { _id, postId, userId, content, parentId } = JSON.parse(message.value);
+        // receive new postComment and save to db
+        const newTopicComment = new TopicComment({ _id, postId, userId, content, parentId });
+        await newTopicComment.save();
+      } catch (error) {
+        console.log(error);
+      }
+      break;
+    case "addSubTopicComment":
+      console.log("Add subTopicComment");
+      try {
+        const { _id, content, userId } = JSON.parse(message.value);
+        await TopicComment.updateOne({ _id },
+          { $push: { subComments: { userId, content } } },
+          { new: true, upsert: true });
+      } catch (error) {
+        console.log(error);
+      }
+      break;
+
     default:
-      break
+      break;
   }
-})
+});

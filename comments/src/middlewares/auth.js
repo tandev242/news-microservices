@@ -1,13 +1,16 @@
+const jwt = require('jsonwebtoken')
+
 exports.isVerify = (req, res, next) => {
     if (req.headers.authorization) {
-
-        // headers.authorization kieu "User sdadsadsadsasdas" la table + token 
-        const token = req.headers.authorization.split(' ')[1];
-        // decode token de lay User theo cai secret key
-        const user = jwt.verify(token, process.env.JWT_SECRET);
-
-        // luu user vao request
-        req.user = user;
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            // decode token de lay User theo cai secret key
+            const user = jwt.verify(token, process.env.JWT_SECRET);
+            // luu user vao request
+            req.user = user;
+        }catch(error){
+            return res.status(400).json({ success: false, msg: error.message });
+        }
     } else {
         return res.status(400).json({ success: false, msg: "Authorization required" });
     }

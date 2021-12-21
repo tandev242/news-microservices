@@ -1,4 +1,5 @@
 const TopicComment = require('../models/topicComment.model');
+const { sendToConsumer } = require('../services/kafka')
 
 const addTopicComment = async (req, res) => {
     const { postId, content, parentId } = req.body;
@@ -6,6 +7,8 @@ const addTopicComment = async (req, res) => {
     try {
         const topicComment = new TopicComment({ postId, userId, content, parentId });
         await topicComment.save();
+
+        await sendToConsumer('addTopicComment', { _id: topicComment._id, postId, userId, content, parentId });
         res.status(201).json({
             success: true,
             message:
@@ -21,13 +24,15 @@ const addSubTopicComment = async (req, res) => {
     const { _id, content } = req.body;
     const userId = req.user._id;
     try {
-        await TopicComment.updateOne({ _id },
+        await TopicComment.findOneAndUpdate({ _id },
             { $push: { subComments: { userId, content } } },
             { new: true, upsert: true });
+
+        await sendToConsumer('addSubTopicComment', { _id, userId, content });
         res.status(201).json({
             success: true,
             message:
-                'Sub comment has been created successfully'
+                'Sub topic comment has been created successfully'
         })
     } catch (error) {
         res.status(500).json({ success: false, msg: error.message })
