@@ -3,18 +3,15 @@ const app = express()
 const createError = require('http-errors')
 const mongoose = require('mongoose')
 require('dotenv').config()
+const cors = require("cors");
+
 const userRouter = require('./routes/user.route')
 
 const postRouter = require('./routes/post.route')
-const PORT = process.env.PORT || 7000
+require('./services/kafkaConsumer')
 
-try{
-  require('./services/kafkaConsumer')
-}catch(error){
-  console.log(error)
-}
-
-
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 
 app.use('/api/post', postRouter)
@@ -33,6 +30,7 @@ app.use((err, req, res, next) => {
   res.json({ success: err.success, msg: err.message })
 })
 
+const PORT = process.env.PORT || 7000
 app.listen(PORT, () => {
   mongoose
     .connect(process.env.CONNECTION_STRING, {
@@ -42,6 +40,5 @@ app.listen(PORT, () => {
     .then(() => {
       console.log('Database connected')
     })
-
   console.log('Server is starting on PORT: ' + PORT)
 })
