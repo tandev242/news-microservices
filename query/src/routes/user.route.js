@@ -7,7 +7,7 @@ router.get(
   '/getAllUsers',
   auth,
   auth_role(['admin']),
-  userController.getAllUser
+  userController.getAllUsers
 )
 
 module.exports = router

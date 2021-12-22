@@ -7,119 +7,122 @@ const TopicComment = require('../models/topicComment.model')
 class postController {
     async getPostBySlug(req, res, next) {
         try {
-            const {slug} = req.params
+            const { slug } = req.params
             console.log(slug);
-            const foundPost = await Post.findOne({slug})
+            const foundPost = await Post.findOne({ slug })
 
-            if (!foundPost) return next(createError(404, {success:false, message: "Not found"}))
+            if (!foundPost) return next(createError(404, { success: false, message: "Not found" }))
 
-            const foundPostComment = await PostComment.find({postId: foundPost._id})
+            const foundPostComment = await PostComment.find({ postId: foundPost._id })
 
-            const foundTopicComment = await TopicComment.find({postId: foundPost._id})
+            const foundTopicComment = await TopicComment.find({ postId: foundPost._id })
 
-            return res.status(200).json({success: true, post: foundPost, postComments: foundPostComment, topicComments: foundTopicComment})
+            return res.status(200).json({ success: true, post: foundPost, postComments: foundPostComment, topicComments: foundTopicComment })
         } catch (error) {
-            return next(createError(400, {success: false, message: error.message}))  
+            return next(createError(400, { success: false, message: error.message }))
         }
     }
-    async getLastPost(req, res, next) {
+    async getLastPosts(req, res, next) {
         try {
-            const foundPost = await Post.find({}, {}, {sort: {"createAt": -1}}).limit(10)
+            const foundPosts = await Post.find({}, {}, { sort: { "createAt": -1 } }).limit(10)
 
-            return res.status(200).json({success: true, posts: foundPost})
+            return res.status(200).json({ success: true, posts: foundPosts })
         } catch (error) {
-            return next(createError(400, {success: false, message: error.message}))  
+            return next(createError(400, { success: false, message: error.message }))
         }
     }
-    async getAllPost(req, res, next) {
+    async getAllPosts(req, res, next) {
         try {
             const foundPost = await Post.find()
 
-            return res.status(200).json({success: true, posts: foundPost})
+            return res.status(200).json({ success: true, posts: foundPost })
         } catch (error) {
-            return next(createError(400, {success: false, message: error.message}))  
-            
+            return next(createError(400, { success: false, message: error.message }))
+
         }
     }
-    async getPostByCategory(req, res, next) {
+    async getPostsByCategory(req, res, next) {
         try {
-            let {slug} = req.params
-            slug = "/"+slug
+            let { slug } = req.params
+            slug = "/" + slug
 
-            let foundCategory = await Category.findOne({slug, parentId: "1000000"})
-            
-            if (!foundCategory) return next(createError(404, {success:false, message: "Not found"}))
+            let foundCategory = await Category.findOne({ slug, parentId: "1000000" })
 
-            let regex = new RegExp("^" + (foundCategory.parentId + "," + foundCategory._id)) 
-            let foundSubCategory = await Category.find({parentId: regex})
+            if (!foundCategory) return next(createError(404, { success: false, message: "Not found" }))
+
+            let regex = new RegExp("^" + (foundCategory.parentId + "," + foundCategory._id))
+            let foundSubCategory = await Category.find({ parentId: regex })
 
             foundSubCategory.push(foundCategory)
 
             foundSubCategory = foundSubCategory.map((e) => e._id)
             // console.log(foundSubCategory);
-            let foundPost = await Post.find({categoryId: {$in: foundSubCategory}}).limit(4)
-            
-            return res.status(200).json({success: true, posts: foundPost})
+            let foundPosts = await Post.find({ categoryId: { $in: foundSubCategory } }).limit(4)
+
+            return res.status(200).json({ success: true, posts: foundPosts })
         } catch (error) {
-            return next(createError(400, {success: false, message: error.message}))  
-            
+            return next(createError(400, { success: false, message: error.message }))
+
         }
     }
     async getListCategory(req, res, next) {
         try {
-            let foundParentCategory = await Category.find({parentId: "1000000"})
+            let foundParentCategory = await Category.find({ parentId: "1000000" })
 
             // foundParentCategory = foundParentCategory.map(e => e.parentId = e.parentId + "," + e._id)
             // console.log(foundParentCategory);
             let foundListCategory = await Category.aggregate([
-                {$match: {"parentId": {$in: foundParentCategory.map(e => e.parentId = e.parentId + "," + e._id)}}},
-                {$group: {
-                    _id: "$parentId",
-                    data: {$push: "$$ROOT"}
-                }}
+                { $match: { "parentId": { $in: foundParentCategory.map(e => e.parentId = e.parentId + "," + e._id) } } },
+                {
+                    $group: {
+                        _id: "$parentId",
+                        data: { $push: "$$ROOT" }
+                    }
+                }
             ])
 
             for (let el of foundListCategory) {
                 let temp = foundParentCategory.map(e => {
                     // console.log(e.parentId);
                     if ((e.parentId) === el._id) {
-                    el.name = e.name
-                    el.parentId = e.parentId
-                    el.slug = e.slug
-                }})
+                        el.name = e.name
+                        el.parentId = e.parentId
+                        el.slug = e.slug
+                    }
+                })
                 delete el._id
             }
 
-            return res.status(200).json({success: true, categories: foundListCategory})
+            return res.status(200).json({ success: true, categories: foundListCategory })
         } catch (error) {
-            return next(createError(400, {success: false, message: error.message}))  
-            
+            return next(createError(400, { success: false, message: error.message }))
+
         }
     }
-    async getAllPostByCategory(req, res, next) {
+    async getAllPostsByCategory(req, res, next) {
         try {
-            let {slug, subSlug} = req.params
-            slug = "/"+slug
+            let { slug, subSlug } = req.params
+            slug = "/" + slug
             if (subSlug) {
                 slug = slug + '/' + subSlug
             }
 
-            let foundCategory = await Category.findOne({slug})
+            let foundCategory = await Category.findOne({ slug })
             // console.log(foundCategory);
-            if (!foundCategory) return next(createError(404, {success:false, message: "Not found"}))
+            if (!foundCategory) return next(createError(404, { success: false, message: "Not found" }))
 
-            let regex = new RegExp("^" + (foundCategory.parentId + "," + foundCategory._id)) 
-            let foundSubCategory = await Category.find({parentId: regex})
+            let regex = new RegExp("^" + (foundCategory.parentId + "," + foundCategory._id))
+            let foundSubCategory = await Category.find({ parentId: regex })
 
             foundSubCategory.push(foundCategory)
 
             foundSubCategory = foundSubCategory.map((e) => e._id)
             // console.log(foundSubCategory);
-            let foundPost = await Post.find({categoryId: {$in: foundSubCategory}}).limit(50)
-            
-            return res.status(200).json({success: true, posts: foundPost})
+            let foundPosts = await Post.find({ categoryId: { $in: foundSubCategory } }).limit(50)
+
+            return res.status(200).json({ success: true, posts: foundPosts })
         } catch (error) {
-            return next(createError(400, {success: false, message: error.message}))  
+            return next(createError(400, { success: false, message: error.message }))
         }
     }
 }
