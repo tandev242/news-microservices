@@ -18,12 +18,3 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
-  crawlerservice:
-    image: crawlerservice
-    build:
-      context: crawler
-      dockerfile: ./Dockerfile
-    environment:
-      NODE_ENV: production
-    depends_on:
-      - kafka
