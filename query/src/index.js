@@ -8,14 +8,18 @@ const userRouter = require('./routes/user.route')
 const postRouter = require('./routes/post.route')
 const PORT = process.env.PORT || 7000
 
-require('./services/kafkaConsumer')
+try{
+  require('./services/kafkaConsumer')
+}catch(error){
+  console.log(error)
+}
 
 
 app.use(express.json())
 
 app.use('/api/post', postRouter)
 
-app.use('/api/users', userRouter)
+app.use('/api/user', userRouter)
 // Error 404 - Not found
 app.use((req, res, next) => {
   next(createError.NotFound())
@@ -39,5 +43,5 @@ app.listen(PORT, () => {
       console.log('Database connected')
     })
 
-  console.log('Server is starting')
+  console.log('Server is starting on PORT: ' + PORT)
 })
