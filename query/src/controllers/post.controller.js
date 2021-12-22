@@ -1,11 +1,8 @@
-const express = require('express')
 const createError = require('http-errors')
 const Post = require('../models/post.model')
 const Category = require('../models/category.model')
 const PostComment = require('../models/postComment.model')
 const TopicComment = require('../models/topicComment.model')
-const mongoose = require('mongoose')
-
 
 class postController {
     async getPostBySlug(req, res, next) {
@@ -20,7 +17,7 @@ class postController {
 
             const foundTopicComment = await TopicComment.find({postId: foundPost._id})
 
-            return res.status(200).json({success: true, data: {...foundPost._doc, postComments: foundPostComment, topicComments: foundTopicComment}})
+            return res.status(200).json({success: true, post: foundPost, postComments: foundPostComment, topicComments: foundTopicComment})
         } catch (error) {
             return next(createError(400, {success: false, message: error.message}))  
         }
@@ -29,7 +26,7 @@ class postController {
         try {
             const foundPost = await Post.find({}, {}, {sort: {"createAt": -1}}).limit(10)
 
-            return res.status(200).json({success: true, data: foundPost})
+            return res.status(200).json({success: true, posts: foundPost})
         } catch (error) {
             return next(createError(400, {success: false, message: error.message}))  
         }
@@ -38,7 +35,7 @@ class postController {
         try {
             const foundPost = await Post.find()
 
-            return res.status(200).json({success: true, data: foundPost})
+            return res.status(200).json({success: true, posts: foundPost})
         } catch (error) {
             return next(createError(400, {success: false, message: error.message}))  
             
@@ -62,7 +59,7 @@ class postController {
             // console.log(foundSubCategory);
             let foundPost = await Post.find({categoryId: {$in: foundSubCategory}}).limit(4)
             
-            return res.status(200).json({success: true, data: foundPost})
+            return res.status(200).json({success: true, posts: foundPost})
         } catch (error) {
             return next(createError(400, {success: false, message: error.message}))  
             
@@ -93,7 +90,7 @@ class postController {
                 delete el._id
             }
 
-            return res.status(200).json(foundListCategory)
+            return res.status(200).json({success: true, categories: foundListCategory})
         } catch (error) {
             return next(createError(400, {success: false, message: error.message}))  
             
@@ -108,7 +105,7 @@ class postController {
             }
 
             let foundCategory = await Category.findOne({slug})
-            console.log(foundCategory);
+            // console.log(foundCategory);
             if (!foundCategory) return next(createError(404, {success:false, message: "Not found"}))
 
             let regex = new RegExp("^" + (foundCategory.parentId + "," + foundCategory._id)) 
@@ -120,7 +117,7 @@ class postController {
             // console.log(foundSubCategory);
             let foundPost = await Post.find({categoryId: {$in: foundSubCategory}}).limit(50)
             
-            return res.status(200).json({success: true, data: foundPost})
+            return res.status(200).json({success: true, posts: foundPost})
         } catch (error) {
             return next(createError(400, {success: false, message: error.message}))  
         }
