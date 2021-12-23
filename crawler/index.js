@@ -98,10 +98,13 @@ const crawl = async (category_id) => {
         if (el.share_url) {
           var content = await getContent(el.share_url);
           // console.log(el);
+          
           content = content.replaceAll('"', "'");
           content = content.replaceAll("amp;", "");
           content = content.replaceAll("src", "src1");
           content = content.replaceAll("data-src1", "src");
+
+          content = content.replaceAll("src1=\'http", "src=\'http");
 
           el.content = content;
         }
