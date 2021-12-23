@@ -13,6 +13,7 @@ const postSchema = new mongoose.Schema({
     categoryId: {
         type: String,
         required: true,
+        ref: 'Category',
         default: '',
     },
     title: {

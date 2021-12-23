@@ -10,6 +10,7 @@ class postController {
             const { slug } = req.params
             console.log(slug);
             const foundPost = await Post.findOne({ slug })
+                .populate({ path: "categoryId", select: "_id name slug" })
 
             if (!foundPost) return next(createError(404, { success: false, message: "Not found" }))
 
@@ -24,7 +25,9 @@ class postController {
     }
     async getLastPosts(req, res, next) {
         try {
-            const foundPosts = await Post.find({}, {}, { sort: { "createAt": -1 } }).limit(10)
+            const foundPosts = await Post.find({}, {}, { sort: { "createAt": -1 } })
+                .populate({ path: "categoryId", select: "_id name slug" })
+                .limit(20)
 
             return res.status(200).json({ success: true, posts: foundPosts })
         } catch (error) {
@@ -34,6 +37,7 @@ class postController {
     async getAllPosts(req, res, next) {
         try {
             const foundPost = await Post.find()
+                .populate({ path: "categoryId", select: "_id name slug" })
 
             return res.status(200).json({ success: true, posts: foundPost })
         } catch (error) {
@@ -57,9 +61,11 @@ class postController {
 
             foundSubCategory = foundSubCategory.map((e) => e._id)
             // console.log(foundSubCategory);
-            let foundPosts = await Post.find({ categoryId: { $in: foundSubCategory } }).limit(4)
+            let foundPosts = await Post.find({ categoryId: { $in: foundSubCategory } })
+                .populate({ path: "categoryId", select: "_id name slug" })
+                .limit(4)
 
-            return res.status(200).json({ success: true, posts: foundPosts })
+            return res.status(200).json({ success: true, posts: foundPosts, category: foundCategory })
         } catch (error) {
             return next(createError(400, { success: false, message: error.message }))
 
@@ -76,7 +82,7 @@ class postController {
                 {
                     $group: {
                         _id: "$parentId",
-                        data: { $push: "$$ROOT" }
+                        children: { $push: "$$ROOT" }
                     }
                 }
             ])
@@ -118,9 +124,11 @@ class postController {
 
             foundSubCategory = foundSubCategory.map((e) => e._id)
             // console.log(foundSubCategory);
-            let foundPosts = await Post.find({ categoryId: { $in: foundSubCategory } }).limit(50)
+            let foundPosts = await Post.find({ categoryId: { $in: foundSubCategory } })
+                .populate({ path: "categoryId", select: "_id name slug" })
+                .limit(50)
 
-            return res.status(200).json({ success: true, posts: foundPosts })
+            return res.status(200).json({ success: true, posts: foundPosts, category: foundCategory })
         } catch (error) {
             return next(createError(400, { success: false, message: error.message }))
         }
