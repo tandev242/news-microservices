@@ -1,0 +1,24 @@
+{
+  "name": "news-microservices",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "query": "cd query/ && npm run dev",
+    "post": "cd posts/ && npm run dev",
+    "crawler": "cd crawler/ && npm run dev",
+    "kafka": "docker start 2303dbc95013 && docker start b2b00d2b4f52",
+    "start": "concurrently \"npm run kafka\" \"npm run query\" \"npm run post\" \"npm run crawler\" "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tandev2k/news-microservices.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tandev2k/news-microservices/issues"
+  },
+  "homepage": "https://github.com/tandev2k/news-microservices#readme"
+}

@@ -222,6 +222,7 @@ const crawl = async (category_id) => {
 
 (async () => {
   try {
+    console.log("Crawler is starting");
     // Promise.all(
     listParentCategory.map(async (e) => {
       await crawl(String(e.categoryId));
