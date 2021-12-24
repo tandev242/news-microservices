@@ -8,7 +8,7 @@
     "post": "cd posts/ && npm run dev",
     "crawler": "cd crawler/ && npm run dev",
     "kafka": "docker start 2303dbc95013 && docker start b2b00d2b4f52",
-    "start": "concurrently \"npm run kafka\" \"npm run query\" \"npm run post\" \"npm run crawler\" "
+    "start": "npm run kafka && sleep 5 && concurrently \"npm run query\" \"npm run post\" \"npm run crawler\" "
   },
   "repository": {
     "type": "git",
