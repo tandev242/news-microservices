@@ -53,19 +53,17 @@ const forgotPassword = async (req, res) => {
     }
     //delete old token if this user already has token
     await Token.findOneAndRemove({ userId: user._id })
-
     const token = randomBytes(16).toString('hex')
     await Token.create({
       userId: user._id,
       token,
     })
-    const output = createOutput(`http://localhost:3000/reset-password/${token}`)
+
+    const output = createOutput(`http://localhost:3000/resetPassword/${token}`)
     sendMail(email, output)
     res.status(200).json({
       success: true,
-      message:
-        'please send patch request with newPassword to this link in 3 minute to reset password',
-      data: { link: `http://localhost:3000/reset-password/${token}` },
+      msg: 'we sent request for change password to your email. Please check your email for changing password in 5 minutes',
     })
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message })
@@ -77,11 +75,12 @@ const resetPassword = async (req, res) => {
     //string token
     const token = req.params.token
     const newPassword = req.body.newPassword
-
     //object token
     const tokenRecord = await Token.findOne({ token })
     if (!tokenRecord) {
-      return res.status(404).json({ success: false, msg: 'token is not found' })
+      return res
+        .status(404)
+        .json({ success: false, msg: 'token expire or not exist' })
     }
     const user = await User.findById(tokenRecord.userId)
     if (!user) {

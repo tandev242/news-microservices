@@ -8,23 +8,25 @@ const login = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, errors: 'email or password incorrect' })
+        .json({ success: false, msg: 'email or password incorrect' })
     }
     const isMatchPassword = await user.comparePassword(password)
     if (!isMatchPassword) {
       return res
         .status(400)
-        .json({ success: false, errors: 'email or password incorrect' })
+        .json({ success: false, msg: 'email or password incorrect' })
     }
     const token = jwt.sign(
       { _id: user._id, role: user.role },
       process.env.JWT_SECRET
     )
+    user.password = undefined
+
     return res
       .status(200)
-      .json({ success: true, message: `login successfully`, data: { token } })
+      .json({ success: true, message: `login successfully`, token, user })
   } catch (error) {
-    res.status(400).json({ success: false, errors: error.message })
+    res.status(400).json({ success: false, msg: error.message })
   }
 }
 

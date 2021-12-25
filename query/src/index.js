@@ -2,16 +2,17 @@ const express = require('express')
 const app = express()
 const createError = require('http-errors')
 const mongoose = require('mongoose')
+
 require('dotenv').config()
-const cors = require("cors");
+const cors = require('cors')
 
 const userRouter = require('./routes/user.route')
 
 const postRouter = require('./routes/post.route')
 require('./services/kafkaConsumer')
 
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors())
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.use('/api/post', postRouter)
@@ -24,7 +25,6 @@ app.use((req, res, next) => {
 
 // Handle error middleware
 app.use((err, req, res, next) => {
-  console.log(err)
   // console.log(req.body);
   res.status(err.status || 500)
   res.json({ success: err.success, msg: err.message })
