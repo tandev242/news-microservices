@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const userRouter = require('./router/user.router')
 const morgan = require('morgan')
 const passport = require('passport')
+const cors = require('cors')
 require('./services/passport.service')(passport)
 require('./services/kafkaProducer')
 
@@ -17,7 +18,7 @@ mongoose
   .then(() => {
     console.log('Database connected')
   })
-
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/api/user', userRouter)

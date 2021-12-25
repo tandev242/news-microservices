@@ -3,10 +3,10 @@ const bcrypt = require('bcrypt')
 
 const userSchema = new mongoose.Schema(
   {
-    _id: {
+    name: {
       type: String,
       required: true,
-      unique: true,
+      default: '',
     },
     email: {
       type: String,
@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    avatar: {
+      type: String,
+      default: process.env.DEFAULT_IMAGE,
+    },
     role: {
       type: String,
       required: true,
@@ -26,7 +30,7 @@ const userSchema = new mongoose.Schema(
       default: 'user',
     },
   },
-  { _id: false, timestamps: true }
+  { timestamps: true }
 )
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

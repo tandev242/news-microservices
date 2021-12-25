@@ -17,6 +17,13 @@ router.post(
   validateRequestSchema,
   userController.signUp
 )
+router.post(
+  '/signUpForAdmin',
+  passport.authenticate('jwt', { session: false }),
+  registerSchema,
+  validateRequestSchema,
+  userController.signUpForAdmin
+)
 
 router.post(
   '/forgotPassword',
@@ -27,6 +34,7 @@ router.post(
 
 router.post(
   '/resetPassword/:token',
+
   resetPasswordSchema,
   validateRequestSchema,
   userController.resetPassword
@@ -38,9 +46,5 @@ router.post(
   uploadAvatar,
   userController.uploadAvatar
 )
-router.post(
-  '/signUpForAdmin',
-  passport.authenticate('jwt', { session: false }),
-  userController.signUpForAdmin
-)
+
 module.exports = router

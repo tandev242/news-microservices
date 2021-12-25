@@ -18,6 +18,9 @@ router.get('/getListCategory', postController.getListCategory)
 
 // Lấy all post theo slug category (50 post)
 router.get('/getPostsByCategory/:slug', postController.getPostsByCategory)
-router.get('/getAllPostsByCategory/:slug/:subSlug', postController.getAllPostsByCategory)
+router.get(
+  '/getAllPostsByCategory/:slug/:subSlug',
+  postController.getAllPostsByCategory
+)
 
 module.exports = router

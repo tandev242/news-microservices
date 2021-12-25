@@ -14,7 +14,7 @@ const auth = async (req, res, next) => {
       return res
         .status(401)
         .json({ success: false, msg: 'Invalid Authentication..' })
-    const user = await User.findOne({ _id: decoded._id }).select('-password')
+    const user = await User.findById(decoded._id).select('-password')
     req.user = user
     next()
   } catch (err) {
