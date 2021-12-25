@@ -7,7 +7,7 @@
     "query": "cd query/ && npm run dev",
     "post": "cd posts/ && npm run dev",
     "crawler": "cd crawler/ && npm run dev",
-    "kafka": "docker start 2303dbc95013 && docker start b2b00d2b4f52",
+    "kafka": "docker start 000949026ebb && docker start 9942678ca3c8",
     "start": "npm run kafka && sleep 5 && concurrently \"npm run query\" \"npm run post\" \"npm run crawler\" "
   },
   "repository": {
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/tandev2k/news-microservices/issues"
   },
-  "homepage": "https://github.com/tandev2k/news-microservices#readme"
+  "homepage": "https://github.com/tandev2k/news-microservices#readme",
+  "dependencies": {
+    "concurrently": "^6.5.1"
+  }
 }
