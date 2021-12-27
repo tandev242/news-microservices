@@ -2,13 +2,12 @@ const TopicComment = require('../models/topicComment.model');
 const { sendToConsumer } = require('../services/kafka')
 
 const addTopicComment = async (req, res) => {
-    const { postId, content, parentId } = req.body;
+    const { postId, content, position } = req.body;
     const userId = req.user._id;
     try {
-        const topicComment = new TopicComment({ postId, userId, content, parentId });
-        await topicComment.save();
+        const topicComment = await TopicComment.create({ postId, userId, content, position });
+        await sendToConsumer('addTopicComment', { topicComment });
 
-        await sendToConsumer('addTopicComment', { _id: topicComment._id, postId, userId, content, parentId });
         res.status(201).json({
             success: true,
             message:

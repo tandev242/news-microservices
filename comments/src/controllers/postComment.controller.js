@@ -5,10 +5,8 @@ const addPostComment = async (req, res) => {
     const { postId, content } = req.body;
     const userId = req.user._id;
     try {
-        const postComment = new PostComment({ postId, userId, content });
-        await postComment.save();
-
-        await sendToConsumer('addPostComment', { _id: postComment._id, postId, userId, content });
+        const postComment = await PostComment.create({ postId, userId, content });
+        await sendToConsumer('addPostComment', { postComment });
 
         res.status(201).json({
             success: true,

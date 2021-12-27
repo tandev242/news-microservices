@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const postCommentSchema = new mongoose.Schema({
-    _id: {
-        type: String,
-        unique: true
-    },
     postId: {
         type: String,
         required: true,
@@ -31,6 +27,6 @@ const postCommentSchema = new mongoose.Schema({
             default: new Date()
         }
     }]
-}, { _id: false, timestamps: true });
+}, { timestamps: true });
 
 module.exports = mongoose.model('PostComment', postCommentSchema)

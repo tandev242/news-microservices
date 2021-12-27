@@ -252,10 +252,9 @@ consumer.on('message', async (message) => {
     case "addPostComment":
       console.log("Add postComment");
       try {
-        let { _id, postId, userId, content } = JSON.parse(message.value);
+        let { postComment } = JSON.parse(message.value);
         // receive new postComment and save to db
-        const newPostComment = new PostComment({ _id, postId, userId, content });
-        await newPostComment.save();
+        await PostComment.create(postComment);
       } catch (error) {
         console.log(error);
       }
@@ -275,10 +274,9 @@ consumer.on('message', async (message) => {
     case "addTopicComment":
       console.log("Add TopicComment");
       try {
-        let { _id, postId, userId, content, parentId } = JSON.parse(message.value);
+        let { topicComment } = JSON.parse(message.value);
         // receive new postComment and save to db
-        const newTopicComment = new TopicComment({ _id, postId, userId, content, parentId });
-        await newTopicComment.save();
+        await TopicComment.create(topicComment);
       } catch (error) {
         console.log(error);
       }
