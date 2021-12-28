@@ -6,7 +6,8 @@ const postCommentSchema = new mongoose.Schema({
         required: true,
     },
     userId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     content: {
@@ -15,7 +16,8 @@ const postCommentSchema = new mongoose.Schema({
     },
     subComments: [{
         userId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
             required: true
         },
         content: {

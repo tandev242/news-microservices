@@ -15,8 +15,22 @@ class postController {
             if (!foundPost) return next(createError(404, { success: false, message: "Not found" }))
 
             const foundPostComment = await PostComment.find({ postId: foundPost._id })
+                .populate({ path: "userId", select: "_id name avatar" })
+                .populate({
+                    path: 'subComments', populate: {
+                        path: "userId", select: "_id name avatar"
+                    }
+                })
+                .sort({ createdAt: -1 })
 
             const foundTopicComment = await TopicComment.find({ postId: foundPost._id })
+                .populate("userId")
+                .populate({
+                    path: 'subComments', populate: {
+                        path: "userId", select: "_id name avatar"
+                    }
+                })
+                .sort({ createdAt: -1 })
 
             return res.status(200).json({ success: true, post: foundPost, postComments: foundPostComment, topicComments: foundTopicComment })
         } catch (error) {
