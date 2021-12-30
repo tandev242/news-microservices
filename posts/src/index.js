@@ -7,6 +7,8 @@ const createError = require('http-errors')
 const cors = require('cors')
 const postRouter = require('./routes/post.route')
 const categoryRouter = require('./routes/category.route')
+const morgan = require('morgan')
+var bodyParser = require('body-parser');
 
 mongoose
   .connect(process.env.CONNECTION_STRING, {
@@ -20,6 +22,8 @@ mongoose
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
+app.use(morgan('dev'))
+app.use("/uploads", express.static("./uploads"));
 app.use('/api/post', postRouter)
 app.use('/api/category', categoryRouter)
 

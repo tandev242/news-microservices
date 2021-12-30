@@ -1,14 +1,29 @@
-const createError = require('http-errors')
-const Posts = require('../models/post.model')
-const Categories = require('../models/category.model')
+const createError = require("http-errors");
+const Posts = require("../models/post.model");
+const Categories = require("../models/category.model");
 const slugify = require("slugify");
-const {sendProducer} = require('../services/kafkaProducer')
+const { sendProducer } = require("../services/kafkaProducer");
+const multiparty = require("multiparty");
+
+const promisifyUpload = (req) => new Promise((resolve, reject) => {
+    const form = new multiparty.Form();
+
+    form.parse(req, function(err, fields, files) {
+        // if (err) return reject(err);
+        console.log(err);
+        return resolve([fields, files]);
+    });
+});
 
 class postController {
     async addPost(req, res, next) {
         try {
-            const {title, categoryId, lead, content, thumbnailUrl} = req.body
-
+            // console.log(req.file);
+            // console.log(req.body);
+            let {title, categoryId, lead, content} = req.body
+            let thumbnailUrl = req.get('host') + "/uploads/" + req.file.filename
+            // console.log(title, categoryId, lead, content, thumbnailUrl);
+            // categoryId = categoryId
             // Create slug
             let slug = slugify(title, {
                 remove: undefined, // remove characters that match regex, defaults to `undefined`
@@ -28,69 +43,94 @@ class postController {
             const newPost = new Posts({title, categoryId, slug, lead, content, thumbnailUrl})
             await newPost.save()
 
-
             // Kafka producer
             await sendProducer('createPost', {postId: newPost._id, title, categoryId, lead, content, thumbnailUrl})
 
-            return res.status(200).json({success: true, message: "Add post successfull!"})
+            return res
+                .status(200)
+                .json({ success: true, message: "Add post successfull!" });
         } catch (error) {
             // console.log(error);
-            next(createError(400, {success: false, message: error.message}))
+            next(createError(400, { success: false, message: error.message }));
         }
-    } 
+    }
     async updatePost(req, res, next) {
         try {
-            const update = req.body
-            const postId = req.params.postId
+            const update = req.body;
+            const postId = req.params.postId;
 
             if (update.categoryId) {
-                const foundCategory = await Categories.findOne({_id: categoryId})
+                const foundCategory = await Categories.findOne({
+                    _id: categoryId,
+                });
                 if (!foundCategory) {
-                    return next(createError(400, {success: false, message: "Can't find category"}))
+                    return next(
+                        createError(400, {
+                            success: false,
+                            message: "Can't find category",
+                        })
+                    );
                 }
             }
 
             if (update.title) {
                 update.slug = slugify(update.title, {
                     remove: undefined, // remove characters that match regex, defaults to `undefined`
-                    lower: true,      // convert to lower case, defaults to `false`
-                    strict: true,     // strip special characters except replacement, defaults to `false`
-                    locale: 'vi',       // language code of the locale to use
-                    trim: true         // trim leading and trailing replacement chars, defaults to `true`
-                })
+                    lower: true, // convert to lower case, defaults to `false`
+                    strict: true, // strip special characters except replacement, defaults to `false`
+                    locale: "vi", // language code of the locale to use
+                    trim: true, // trim leading and trailing replacement chars, defaults to `true`
+                });
             }
-             
-            const updatePost = await Posts.updateOne({_id: postId}, {$set: { ...update}})
-            if (updatePost.matchedCount === 0) {
-                return next(createError(400, {success: false, message: "Can't find postId"}))
-            }
-            
-            // Kafka 
-            await sendProducer('updatePost', {postId, update})
 
-            return res.status(200).json({success: true, message: "Update post successfull"})
+            const updatePost = await Posts.updateOne(
+                { _id: postId },
+                { $set: { ...update } }
+            );
+            if (updatePost.matchedCount === 0) {
+                return next(
+                    createError(400, {
+                        success: false,
+                        message: "Can't find postId",
+                    })
+                );
+            }
+
+            // Kafka
+            await sendProducer("updatePost", { postId, update });
+
+            return res
+                .status(200)
+                .json({ success: true, message: "Update post successfull" });
         } catch (error) {
             // console.log(error);
-            next(createError(400, {success: false, message: error.message}))
+            next(createError(400, { success: false, message: error.message }));
         }
     }
     async deletePost(req, res, next) {
         try {
-            const postId = req.params.postId
-            
-            const deletePost = await Posts.deleteOne({_id: postId})
+            const postId = req.params.postId;
+
+            const deletePost = await Posts.deleteOne({ _id: postId });
 
             if (deletePost.deletedCount === 0) {
-                return next(createError(400, {success: false, message: "Cant find post"}))
+                return next(
+                    createError(400, {
+                        success: false,
+                        message: "Cant find post",
+                    })
+                );
             }
 
             // Kafka
-            await sendProducer('deletePost', {postId})
+            await sendProducer("deletePost", { postId });
 
-            return res.status(200).json({success: true, message: "Delete post successfull"})
+            return res
+                .status(200)
+                .json({ success: true, message: "Delete post successfull" });
         } catch (error) {
             // console.log(error);
-            next(createError(400, {success: false, message: error.message}))
+            next(createError(400, { success: false, message: error.message }));
         }
     }
 }
