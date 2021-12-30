@@ -39,7 +39,7 @@ class postController {
     }
     async getLastPosts(req, res, next) {
         try {
-            const foundPosts = await Post.find({}, {}, { sort: { "createAt": -1 } })
+            const foundPosts = await Post.find({}, {}, { sort: { "createdAt": -1 } })
                 .populate({ path: "categoryId", select: "_id name slug" })
                 .limit(20)
 
