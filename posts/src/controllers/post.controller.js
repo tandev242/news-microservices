@@ -3,17 +3,7 @@ const Posts = require("../models/post.model");
 const Categories = require("../models/category.model");
 const slugify = require("slugify");
 const { sendProducer } = require("../services/kafkaProducer");
-const multiparty = require("multiparty");
-
-const promisifyUpload = (req) => new Promise((resolve, reject) => {
-    const form = new multiparty.Form();
-
-    form.parse(req, function(err, fields, files) {
-        // if (err) return reject(err);
-        console.log(err);
-        return resolve([fields, files]);
-    });
-});
+const { cloudinary, getPublicId } = require('../utils/cloudinary')
 
 class postController {
     async addPost(req, res, next) {
@@ -21,9 +11,11 @@ class postController {
             // console.log(req.file);
             // console.log(req.body);
             let {title, categoryId, lead, content} = req.body
-            let thumbnailUrl = req.get('host') + "/uploads/" + req.file.filename
             // console.log(title, categoryId, lead, content, thumbnailUrl);
             // categoryId = categoryId
+            const result = await cloudinary.uploader.upload(req.file.path)
+            let thumbnailUrl = result.url
+            
             // Create slug
             let slug = slugify(title, {
                 remove: undefined, // remove characters that match regex, defaults to `undefined`
