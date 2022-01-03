@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport')
+const {auth, auth_role} = require('../middlewares/auth')
 const { uploadAvatar } = require('../services/user.service')
 const {
   validateRequestSchema,
@@ -46,5 +47,7 @@ router.post(
   uploadAvatar,
   userController.uploadAvatar
 )
+
+router.patch('/update/:userId', auth, auth_role(['admin']), validateRequestSchema, uploadAvatar, userController.update)
 
 module.exports = router

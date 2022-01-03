@@ -26,6 +26,7 @@ app.use((req, res, next) => {
 // Handle error middleware
 app.use((err, req, res, next) => {
   // console.log(req.body);
+  console.log(err);
   res.status(err.status || 500)
   res.json({ success: err.success, msg: err.message })
 })

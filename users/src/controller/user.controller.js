@@ -4,6 +4,8 @@ const User = require('../models/user.model')
 const { sendMail, createOutput } = require('../services/mail.service')
 const { cloudinary, getPublicId } = require('../utils/cloudinary')
 const { sendProducer } = require('../services/kafkaProducer')
+const bcrypt = require('bcrypt')
+
 
 const signUp = async (req, res) => {
   const { email, password, name } = req.body
@@ -113,10 +115,38 @@ const uploadAvatar = async (req, res) => {
   }
 }
 
+const update = async (req, res) => {
+  try {
+    const userId = req.params.userId
+    // console.log(req.body);
+    // console.log((req.file));
+    const user = {...req.body, _id: userId};
+    const hashedPassword = await bcrypt.hash(user.password, 8)
+    user.password = hashedPassword
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path)
+      user.avatar = result.url
+    }
+    const update = await User.updateOne({_id: userId}, {$set: user})
+    // console.log(update);
+    if (update.modifiedCount === 1) {
+      sendProducer('updateUser', {type: "update", newUser: {...user}})
+      res.status(200).json({success: true, msg: "Update user successful"})
+    }
+    else {
+      res.status(400).json({success: false, msg: "Cant update"})
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, msg: error.message })
+  }
+}
+
 module.exports = {
   signUp,
   forgotPassword,
   resetPassword,
   uploadAvatar,
   signUpForAdmin,
+  update
 }

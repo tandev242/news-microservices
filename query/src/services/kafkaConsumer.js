@@ -243,8 +243,15 @@ consumer.on('message', async (message) => {
       break
     case 'updateUser':
       try {
-        const { newUser } = JSON.parse(message.value)
-        await User.updateOne({ _id: newUser._id }, { ...newUser })
+        console.log("Update user");
+        const { type, newUser } = JSON.parse(message.value)
+        if (type === "update") {
+          await User.updateOne({_id: newUser._id}, {$set: newUser})
+        }
+        else {
+          console.log(newUser);
+          await User.updateOne({ _id: newUser._id }, { ...newUser })
+        }
       } catch (error) {
         console.log(error)
       }
