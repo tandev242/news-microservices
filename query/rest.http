@@ -1,15 +1,16 @@
 GET http://localhost:7000/api/query/post
 
 ###
-GET http://localhost:7000/api/post/getPostBySlug/kham-pha-vung-dat-nui-lua-nicaragua
+GET http://localhost:7000/api/post/getPostBySlug/ton-bay-ty-dong-di-du-hoc-luong-van-ba-coc-ba-dong
 ###
 GET http://localhost:7000/api/post/lastPost
 
 ###
-GET http://localhost:7000/api/post/getAllPost
+GET http://localhost:7000/api/post/getAllPosts
 
 ###
-GET http://localhost:7000/api/post/getPostByCategory/the-gioi
+GET http://localhost:7000/api/post/getPostsByCategory/the-gioi
+GET http://localhost:7000/api/post/getPostsByCategory50/the-gioi
 
 ###
 GET http://localhost:7000/api/post/getListCategory
