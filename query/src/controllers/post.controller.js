@@ -52,7 +52,7 @@ class postController {
         try {
             const foundPost = await Post.find()
                 .populate({ path: "categoryId", select: "_id name slug" })
-
+                .limit(50)
             return res.status(200).json({ success: true, posts: foundPost })
         } catch (error) {
             return next(createError(400, { success: false, message: error.message }))
