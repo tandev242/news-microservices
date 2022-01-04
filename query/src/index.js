@@ -31,7 +31,7 @@ app.use((err, req, res, next) => {
 })
 
 const PORT = process.env.PORT || 7000
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   mongoose
     .connect(process.env.CONNECTION_STRING, {
       useNewUrlParser: true,
@@ -42,3 +42,5 @@ app.listen(PORT, () => {
     })
   console.log('Server is starting on PORT: ' + PORT)
 })
+
+require('./services/socketListener')(server)
