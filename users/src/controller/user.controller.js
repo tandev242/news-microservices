@@ -106,7 +106,7 @@ const uploadAvatar = async (req, res) => {
     user.avatar = result.url
     const newUser = await user.save()
     sendProducer('updateUser', { newUser })
-    res.status(200).json({ success: true, msg: 'update avatar successfully' })
+    res.status(200).json({ success: true, avatar: result.url })
   } catch (error) {
     console.log(error)
     res.status(500).json({ success: false, msg: error.message })
