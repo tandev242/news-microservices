@@ -23,7 +23,6 @@ module.exports = (server) => {
 
     socket.on('join', ({ room, avatar, name }, callback) => {
       const user = addUser({ id: socket.id, avatar, room, name })
-
       socket.join(user.room)
       socket.emit('message', {
         user: 'admin',
@@ -45,9 +44,16 @@ module.exports = (server) => {
       socket.broadcast.to(user.room).emit('addPostComment', { postComment })
     })
     socket.on('updateUser', ({ avatar, name }, calback) => {
-      console.log('updateUser', avatar, name)
+      // console.log('updateUser', avatar, name)
       updateUser(socket.id, name, avatar)
     })
+
+    socket.on('userAddSubComment', ({ reply, type }) => {
+      const user = getUsers(socket.id)
+      if (!user.name) return
+      socket.broadcast.to(user.room).emit('addSubComment', { reply, type })
+    })
+
     socket.on('disconnect', () => {
       removeUser(socket.id)
       console.log('User have left')

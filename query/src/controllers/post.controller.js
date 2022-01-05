@@ -24,7 +24,7 @@ class postController {
             select: '_id name avatar',
           },
         })
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: 1 })
 
       const foundTopicComment = await TopicComment.find({
         postId: foundPost._id,
@@ -61,10 +61,12 @@ class postController {
   }
   async getAllPosts(req, res, next) {
     try {
-      const foundPost = await Post.find().populate({
-        path: 'categoryId',
-        select: '_id name slug',
-      })
+      const foundPost = await Post.find()
+        .populate({
+          path: 'categoryId',
+          select: '_id name slug',
+        })
+        .limit(50)
 
       return res.status(200).json({ success: true, posts: foundPost })
     } catch (error) {
@@ -75,7 +77,6 @@ class postController {
     try {
       let { slug } = req.params
       slug = '/' + slug
-
       let foundCategory = await Category.findOne({ slug, parentId: '1000000' })
 
       if (!foundCategory)
