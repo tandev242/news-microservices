@@ -1,5 +1,20 @@
 const mongoose = require('mongoose')
 
+const subTopicCommentSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    }
+  },
+  { timestamps: true }
+)
+
 const topicCommentSchema = new mongoose.Schema(
   {
     postId: {
@@ -15,23 +30,7 @@ const topicCommentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    subComments: [
-      {
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-          required: true,
-        },
-        content: {
-          type: String,
-          required: true,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now(),
-        },
-      },
-    ],
+    subComments: [subTopicCommentSchema],
     position: {
       startKey: {
         type: String,

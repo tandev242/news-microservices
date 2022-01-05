@@ -11,7 +11,7 @@
     "comment": "cd comments/ && npm run dev",
     "auth": "cd auth/ && npm run dev",
     "kafka": "docker start news-microservices-zookeeper-1 && docker start news-microservices-kafka-1",
-    "start": "npm run kafka && sleep 5 && concurrently \"npm run query\" \"npm run user\" \"npm run auth\" \"npm run comment\" "
+    "start": "concurrently \"npm run query\" \"npm run user\" \"npm run auth\" \"npm run comment\" "
   },
   "repository": {
     "type": "git",

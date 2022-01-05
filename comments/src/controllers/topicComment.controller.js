@@ -1,6 +1,5 @@
 const TopicComment = require('../models/topicComment.model')
 const { sendToConsumer } = require('../services/kafka')
-const moment = require('moment')
 
 const addTopicComment = async (req, res) => {
   const { postId, content, position } = req.body
@@ -37,8 +36,7 @@ const addSubTopicComment = async (req, res) => {
     await sendToConsumer('addSubTopicComment', {
       _id,
       userId,
-      content,
-      createdAt: moment(),
+      content
     })
     res.status(201).json({
       success: true,
