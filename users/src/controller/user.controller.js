@@ -121,6 +121,9 @@ const update = async (req, res) => {
     // console.log(req.body);
     // console.log((req.file));
     const user = {...req.body, _id: userId};
+    if (user.confirmPassword !== user.password) {
+      return res.status(400).json({success: false, msg: 'confirmPassword must match password'})
+    }
     const hashedPassword = await bcrypt.hash(user.password, 8)
     user.password = hashedPassword
     if (req.file) {
