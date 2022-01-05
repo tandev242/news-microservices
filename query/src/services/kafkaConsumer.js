@@ -4,8 +4,8 @@ const client = new kafka.KafkaClient({ kafkaHost: process.env.KAFKA_URL })
 const Posts = require('../models/post.model')
 const Category = require('../models/category.model')
 const User = require('../models/user.model')
-const PostComment = require("../models/postComment.model");
-const TopicComment = require("../models/topicComment.model");
+const PostComment = require('../models/postComment.model')
+const TopicComment = require('../models/topicComment.model')
 const slugify = require('slugify')
 
 // Create topic
@@ -61,27 +61,26 @@ var topicsToCreate = [
     replicationFactor: 1,
   },
   {
-    topic: "addPostComment",
+    topic: 'addPostComment',
     partitions: 1,
     replicationFactor: 1,
   },
   {
-    topic: "addSubPostComment",
+    topic: 'addSubPostComment',
     partitions: 1,
     replicationFactor: 1,
   },
   {
-    topic: "addTopicComment",
+    topic: 'addTopicComment',
     partitions: 1,
     replicationFactor: 1,
   },
   {
-    topic: "addSubTopicComment",
+    topic: 'addSubTopicComment',
     partitions: 1,
     replicationFactor: 1,
   },
 ]
-
 
 const option = {
   groupId: 'kafka-node-group', //consumer group id, default `kafka-node-group`
@@ -126,10 +125,10 @@ const consumer = new Consumer(
     { topic: 'deleteCategory' },
     { topic: 'createUser' },
     { topic: 'updateUser' },
-    { topic: "addPostComment" },
-    { topic: "addSubPostComment" },
-    { topic: "addTopicComment" },
-    { topic: "addSubTopicComment" },
+    { topic: 'addPostComment' },
+    { topic: 'addSubPostComment' },
+    { topic: 'addTopicComment' },
+    { topic: 'addSubTopicComment' },
   ],
   option
 )
@@ -255,52 +254,58 @@ consumer.on('message', async (message) => {
       } catch (error) {
         console.log(error)
       }
-      break;
-    case "addPostComment":
-      console.log("Add postComment");
+      break
+      case 'addPostComment':
+      console.log('Add postComment')
       try {
-        let { postComment } = JSON.parse(message.value);
+        let { postComment } = JSON.parse(message.value)
         // receive new postComment and save to db
-        await PostComment.create(postComment);
+        await PostComment.create(postComment)
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-      break;
-    case "addSubPostComment":
-      console.log("Add subPostComment");
+      break
+    case 'addSubPostComment':
+      console.log('Add subPostComment')
       try {
-        const { _id, content, userId } = JSON.parse(message.value);
-        await PostComment.updateOne({ _id },
-          { $push: { subComments: { userId, content } } },
-          { new: true, upsert: true });
+        const { _id, content, userId } = JSON.parse(message.value)
+        await PostComment.updateOne(
+          { _id },
+          {
+            $push: { subComments: { userId, content } },
+          },
+          { new: true, upsert: true }
+        )
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-      break;
+      break
 
-    case "addTopicComment":
-      console.log("Add TopicComment");
+    case 'addTopicComment':
+      console.log('Add TopicComment')
       try {
-        let { topicComment } = JSON.parse(message.value);
+        let { topicComment } = JSON.parse(message.value)
         // receive new postComment and save to db
-        await TopicComment.create(topicComment);
+        await TopicComment.create(topicComment)
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-      break;
-    case "addSubTopicComment":
-      console.log("Add subTopicComment");
+      break
+    case 'addSubTopicComment':
+      console.log('Add subTopicComment')
       try {
-        const { _id, content, userId } = JSON.parse(message.value);
-        await TopicComment.updateOne({ _id },
+        const { _id, content, userId } = JSON.parse(message.value)
+        await TopicComment.updateOne(
+          { _id },
           { $push: { subComments: { userId, content } } },
-          { new: true, upsert: true });
+          { new: true, upsert: true }
+        )
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-      break;
+      break
 
     default:
-      break;
+      break
   }
-});
+})
