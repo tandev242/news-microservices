@@ -4,6 +4,7 @@ const auth = async (req, res, next) => {
   try {
     const token =
       req.headers['authorization'] && req.headers['authorization'].split(' ')[1]
+    console.log(token)
     if (!token)
       return res
         .status(400)
@@ -18,7 +19,10 @@ const auth = async (req, res, next) => {
     req.user = user
     next()
   } catch (err) {
-    return res.status(401).json({ msg: err.message })
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ success: false, msg: err.message })
+    }
+    return res.status(400).json({ success: false, msg: err.message })
   }
 }
 const auth_role = (permission) => {

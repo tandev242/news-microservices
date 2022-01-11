@@ -18,3 +18,7 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+  redis-server:
+    image: 'redis'
+    ports:
+      - '6379:6379'

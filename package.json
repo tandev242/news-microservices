@@ -10,7 +10,7 @@
     "user": "cd users/ && npm run dev",
     "comment": "cd comments/ && npm run dev",
     "auth": "cd auth/ && npm run dev",
-    "kafka": "docker start news-microservices_kafka_1 && docker start news-microservices_zookeeper_1",
+    "kafka": "docker start news-microservices_kafka_1 && docker start news-microservices_zookeeper_1 && docker start news-microservices_redis-server_1",
     "start": "npm run kafka && sleep 5 && concurrently \"npm run query\" \"npm run user\" \"npm run auth\" \"npm run comment\" "
   },
   "repository": {

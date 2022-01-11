@@ -1,25 +1,54 @@
-const users = []
-const addUser = ({ id, avatar, room, name }) => {
-  const user = { id, avatar, room, name }
-  users.push(user)
-  return user
+const redis = require('redis')
+const users = redis.createClient()
+const addUser = async ({ id, avatar, room, name }) => {
+  return new Promise((resolve, reject) => {
+    const object = JSON.stringify({ avatar, room, name })
+    users.set(id, object, async (error, reply) => {
+      if (error) {
+        reject(error)
+      }
+      const user = await getUser(id)
+      resolve(user)
+    })
+  })
 }
 const removeUser = (id) => {
-  const index = users.findIndex((user) => user.id === id)
-  if (index > -1) return users.splice(index, 1)
+  return new Promise((resolve, reject) => {
+    users.del(id, (error, reply) => {
+      if (error) {
+        reject(error)
+      }
+      resolve(reply)
+    })
+  })
 }
-const getUsers = (id) => {
-  const user = users.find((user) => user.id === id)
-  return user
-}
-const getUsersInRoom = (room) => {
-  return users.filter((user) => user.room === room)
-}
-const updateUser = (id, name, avatar) => {
-  const user = users.find((user) => user.id === id)
-  user.name = name
-  user.avatar = avatar
-  return true
+const getUser = (id) => {
+  return new Promise((resolve, reject) => {
+    users.get(id, (error, reply) => {
+      if (error) {
+        reject(error)
+      }
+      resolve(JSON.parse(reply))
+    })
+  })
 }
 
-module.exports = { addUser, removeUser, getUsers, getUsersInRoom, updateUser }
+const updateUser = (id, name, avatar) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await getUser(id)
+      user.name = name
+      user.avatar = avatar
+      users.set(id, JSON.stringify(user), (error, reply) => {
+        if (error) {
+          reject(error)
+        }
+        resolve(reply)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+module.exports = { addUser, removeUser, getUser, updateUser }

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-exports.isVerify = (req, res, next) => {
+const isVerify = (req, res, next) => {
   if (req.headers.authorization) {
     try {
       const token = req.headers.authorization.split(' ')[1]
@@ -21,17 +21,4 @@ exports.isVerify = (req, res, next) => {
   }
   next()
 }
-
-exports.isUserLoggedIn = (req, res, next) => {
-  if (req.user.role !== 'user') {
-    return res.status(400).json({ success: false, msg: 'User access denied' })
-  }
-  next()
-}
-
-exports.isAdminLoggedIn = (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(400).json({ success: false, msg: 'Admin access denied' })
-  }
-  next()
-}
+module.exports = { isVerify }

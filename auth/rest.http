@@ -1,0 +1,21 @@
+POST http://localhost:10000/api/auth/login
+Content-Type: application/json
+# Authorization: token xxx
+
+{
+    "email":"tranquochuy221096@gmail.com",
+    "password":"claybon123"
+}
+
+###
+GET  http://localhost:10000/api/auth/test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWM0YThiMGRmOGNjYjZlOWQyOTBjY2QiLCJyb2xlIjoidXNlciIsImlhdCI6MTY0MTgwMzgxOSwiZXhwIjoxNjQ0Mzk1ODE5fQ.k-b5JcmTl9mSTaJTAM-CySyPvRmQ7yYzlzcBArWBszw
+
+### 
+POST http://localhost:10000/api/auth/refreshToken
+Content-Type: application/json
+# Authorization: token xxx
+
+{
+    "refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWM0YThiMGRmOGNjYjZlOWQyOTBjY2QiLCJyb2xlIjoidXNlciIsImlhdCI6MTY0MTc4NzQ4MSwiZXhwIjoxNjQ0Mzc5NDgxfQ.sp3dDUnU4j30AguBENA4Mvw9irBVdxP7wLLw8OVhONY"
+}

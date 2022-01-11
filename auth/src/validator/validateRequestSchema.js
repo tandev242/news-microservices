@@ -9,6 +9,12 @@ const loginSchema = [
     .withMessage('password must be at least 6 chars long'),
 ]
 
+const refreshTokenSchema = [
+  body('refreshToken')
+    .isLength({ min: 6 })
+    .withMessage('refresh token be required'),
+]
+
 const validateRequestSchema = (req, res, next) => {
   const errorsResult = validationResult(req)
   //raw errorResult contain value field so make sure to hide it
@@ -22,4 +28,4 @@ const validateRequestSchema = (req, res, next) => {
   }
   next()
 }
-module.exports = { validateRequestSchema, loginSchema }
+module.exports = { validateRequestSchema, loginSchema, refreshTokenSchema }
